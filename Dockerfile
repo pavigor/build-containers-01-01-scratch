@@ -6,14 +6,13 @@ COPY . .
 
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/app.bin cmd/main.go
-
-RUN adduser -S appuser
+RUN adduser -S -u 1001 appuser
 
 FROM scratch
 
 COPY --from=build /go/bin/app.bin /
-COPY --from=build /go/src/app/upload /uploads
 COPY --from=build /etc/passwd /etc/passwd
+COPY --from=build --chown=1001 /go/src/app/upload /uploads
 
 USER appuser
 
